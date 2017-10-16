@@ -1,0 +1,1 @@
+A pattern report for presentations with LaTeX will be put on blackboard

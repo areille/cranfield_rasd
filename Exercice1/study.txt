@@ -1,0 +1,44 @@
+-- LIBRARY CONCERNS --
+
+-> function LibraryName.sort(vector<integer> array)                             √
+    -> void : modify the array -> bad idea because we want the positions array
+    -> returns 2 arrays : the copy of the input array and the position array    √
+    -> only prints arrays
+-> function LibraryName.sort()                                                  x
+    -> void : only prints input and input
+    -> returns 2 arrays : input array from keyboard (could be boring)
+
+
+-- ALGORITHM COMPLEXITY STUDY --
+
+|-------------|------------|------------|------------|--------|
+|             | Worst case | Best case  |   Average  | Stable |
+|-------------|------------|------------|------------|--------|
+| Bubble sort |   O(n2)    |  O(n)      | O(n2)      |   Y    |
+| Insertion   |   O(n2)    |  O(n)      | O(n2)      |   Y    |
+|-------------|------------|------------|------------|--------|
+| Merge       | O(nlog(n)) | O(nlog(n)) | O(nlog(n)) |   Y    |      <-- best choice           √
+| Quicksort   |   O(n2)    |   O(n)     | O(nlog(n)) |   N    |
+| Radix List  |            |            | O(l*n)     |        |     <-- depends on the length of the array 
+| Heapsort    | O(nlog(n)) | O(nlog(n)) | O(nlog(n)) |   N    |
+|-------------|------------|------------|------------|--------|
+
+
+-- RETURN ARRAY STUDY --
+
+-> manipulate directly the initial array
+-> make a copy of the initial array                                             √
+
+
+-- AUXILIARY ARRAY STUDY --
+
+-> make a second array [1, 2, 3, 4, ... , n] and make exactly the same modifications
+than the initial array
+-> make a copy of the initial array and for each element of the sorted array, find where
+it is in the copy of the initial
+
+
+-- DEVELOPMENT LANGUAGE --
+
+-> Python : easy use of the Library
+-> C++ : .h file containing all functions, maybe a class Sort

@@ -1,0 +1,29 @@
+// INTRODUCTION
+
+-> Purpose : analyze softwares about climate simulation and weather forecasting
+-> Fortran langage to write climate simulation and weather forecasting softwares
+-> created in 1957 by IBM
+-> can use C preprocessor
+-> FORTRAN tools useless for this study (compared to Java or C#)
+-> tens of thousands of code line for climate models
+
+
+// MODELS METRICS AND METHODOLOGY
+
+-> analyze data with Photran and a SQL database
+
+-> methods decripted but not as much shown
+
+
+// RESULTS
+
+-> table non well placed
+-> table 5 : would have needed a percentage : unreadable data
+
+
+// CONCLUSION
+
+-> develop software development tools in Fortran for this domain could be difficult : 
+    - lot of code lines
+    - use of deprecated Fortran features
+    - C preprocessor directives to handle

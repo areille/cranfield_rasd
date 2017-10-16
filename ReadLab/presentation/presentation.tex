@@ -1,0 +1,65 @@
+\documentclass{beamer}
+
+
+\usepackage{times}
+\usepackage[T1]{fontenc}
+\ifx\themename\undefined
+    \def\themename{default}
+\fi
+
+\usetheme{\themename}
+
+\beamertemplatetransparentcovered
+\title{Paper Review}
+\subtitle{Climate Models: Challenges for Fortran Development Tools}
+
+\author{Augustin Reille\\Pierre Thouzellier}
+\institute{SETC\\ University of Cranfield}
+\date{13th October 2017}
+
+\begin{document}
+    \begin{frame}
+        \titlepage
+    \end{frame}
+    
+    \begin{frame}
+        \frametitle{General Description - Topic}
+        It was written by 2 researchers from Argentina and 1 from USA in 2014
+        \begin{block}{Topic :}
+            \begin{itemize}
+                \item<1-> Analyze 16 differents softwares about climate simulation and weather forecasting % written with fortran and C++
+                \item<1-> Provide some guidelines for people wishing to develop software development tools for Fortran for this purpose 
+            \end{itemize}
+        \end{block}
+    \end{frame}
+    \begin{frame}
+        \frametitle{The analysis}
+        \begin{block}{They focus :}
+            \begin{itemize}
+                \item<1-> the number of code lines
+                \item<1-> the amount of "old" and "recent" Fortran features
+                \item<1-> the complexity of the code
+                \item<1-> the quantity of C preprocessor directives
+            \end{itemize}
+        \end{block}
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Strenghts and weaknesses}
+        \begin{block}{Strenghts}
+            \begin{itemize}
+                \item Quite complete analysis
+                \item Some complicated notions well-explained
+                \item Clear descriptions of the results
+            \end{itemize}
+        \end{block}
+        \begin{block}{Weaknesses}
+            \begin{itemize}
+                \item Data sometimes difficult to interpret without reading descriptions
+                \item Some figures at the wrong place
+            \end{itemize}
+        \end{block}
+    \end{frame}
+% \framesubtitle{Weaknesses}
+
+\end{document}
