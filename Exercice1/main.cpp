@@ -25,15 +25,19 @@ int main()
     int a = 10000; // 1000-sized vector
     for (int i = 0; i < a; i++)
     {
-        int b = rand() % 50 + 1;
+        int b = rand() % 1000 + 1;
         v.push_back(b);
         std::cout << v[i] << " ";
     }
+    std::cout << std::endl;
+    std::cout << std::endl;
+    std::cout << std::endl;
 
     // BubbleSort(v);
     MergeSort(v);
 
     std::cout << "Your sorted vector is : " << std::endl;
+    std::cout << std::endl;
     for (int i = 0; i < v.size(); i++)
     {
         std::cout << v[i] << " ";
