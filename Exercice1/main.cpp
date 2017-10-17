@@ -3,6 +3,29 @@
 #include "IntegerArraySort.h"
 
 /*
+* Prints out the vector in parameter
+* The boolean only changes the text
+*/
+void printVector(std::vector<int> &v, bool sorted)
+{
+    if (sorted)
+    {
+        std::cout << "Your sorted vector is : " << std::endl;
+    } else {
+
+        std::cout << "Your unsorted vector is : " << std::endl;
+    }
+    std::cout << std::endl;
+    for (int i=0; i<v.size(); i++)
+    {
+        std::cout << v[i] << " ";
+    }
+    std::cout << std::endl;
+    std::cout << std::endl;
+
+}
+
+/*
 * Used to create a vector.
 * If the boolean is true, the vector will be randomly created
 * Else, the user will be asked to fill manually the vector
@@ -44,6 +67,7 @@ int main()
 {
 
     std::vector<int> v = useAutoVectorFilling(true);
+    printVector(v, false);
     std::cout << std::endl;
     std::cout << std::endl;
     std::cout << std::endl;
@@ -55,11 +79,7 @@ int main()
     // BubbleSort(v);
     MergeSort(v);
 
-    std::cout << "Your sorted vector is : " << std::endl;
-    std::cout << std::endl;
-    for (int i = 0; i < v.size(); i++)
-    {
-        std::cout << v[i] << " ";
-    }
+    printVector(v, true);
+
     return 0;
 }
