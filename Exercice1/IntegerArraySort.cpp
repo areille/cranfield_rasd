@@ -1,7 +1,13 @@
 #include "IntegerArraySort.h"
 
-void BubbleSort(std::vector<int> &v)
+std::vector<int> BubbleSort(std::vector<int> &v)
 {
+    std::vector<int> indexes(v.size(), 0);
+    for (int i = 0; i < v.size(); i++)
+    {
+        indexes[i] = i + 1;
+    }
+
     int n = v.size();
     do
     {
@@ -11,15 +17,18 @@ void BubbleSort(std::vector<int> &v)
             if (v[i - 1] > v[i])
             {
                 int pivot = v[i - 1];
+                int indexes_pivot = indexes[i - 1];
                 v[i - 1] = v[i];
+                indexes[i - 1] = indexes[i];
                 v[i] = pivot;
+                indexes[i] = indexes_pivot;
                 x = i;
             }
         }
         n = x;
     } while (n != 0);
+    return indexes;
 }
-
 
 void Copy(std::vector<int> &v, std::vector<int> &w)
 {
@@ -39,7 +48,9 @@ void Merge(std::vector<int> &w, int start, int middle, int end, std::vector<int>
         {
             w[k] = v[i];
             i++;
-        } else {
+        }
+        else
+        {
             w[k] = v[j];
             j++;
         }
@@ -52,14 +63,12 @@ void SplitAndMerge(std::vector<int> &w, int start, int end, std::vector<int> &v)
     {
         return;
     }
-    int middle = (end + start)/2;
+    int middle = (end + start) / 2;
 
     SplitAndMerge(v, start, middle, w);
     SplitAndMerge(v, middle, end, w);
     Merge(w, start, middle, end, v);
-
 }
-
 
 void MergeSort(std::vector<int> &v)
 {
@@ -68,7 +77,3 @@ void MergeSort(std::vector<int> &v)
     Copy(v, w);
     SplitAndMerge(v, 0, n, w);
 }
-
-
-
-

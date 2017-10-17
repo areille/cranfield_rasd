@@ -11,18 +11,33 @@ void printVector(std::vector<int> &v, bool sorted)
     if (sorted)
     {
         std::cout << "Your sorted vector is : " << std::endl;
-    } else {
+    }
+    else
+    {
 
         std::cout << "Your unsorted vector is : " << std::endl;
     }
     std::cout << std::endl;
-    for (int i=0; i<v.size(); i++)
+    for (int i = 0; i < v.size(); i++)
     {
         std::cout << v[i] << " ";
     }
     std::cout << std::endl;
     std::cout << std::endl;
-
+}
+/*
+* prints out the indexes vector
+*/
+void printIndexVector(std::vector<int> &v)
+{
+    std::cout << "The indexes vector is : " << std::endl;
+    std::cout << std::endl;
+    for (int i = 0; i < v.size(); i++)
+    {
+        std::cout << v[i] << " ";
+    }
+    std::cout << std::endl;
+    std::cout << std::endl;
 }
 
 /*
@@ -55,7 +70,7 @@ std::vector<int> useAutoVectorFilling(bool b)
         std::vector<int> v(vsize, 0);
         for (int i = 0; i < vsize; i++)
         {
-            std::cout << "Element " << i << " of the vector :" << std::endl;
+            std::cout << "Element " << i + 1 << " of the vector :" << std::endl;
             std::cin >> v[i];
         }
 
@@ -66,7 +81,7 @@ std::vector<int> useAutoVectorFilling(bool b)
 int main()
 {
 
-    std::vector<int> v = useAutoVectorFilling(true);
+    std::vector<int> v = useAutoVectorFilling(false);
     printVector(v, false);
     std::cout << std::endl;
     std::cout << std::endl;
@@ -76,10 +91,12 @@ int main()
     * Choose which method to use
     */
 
+    std::vector<int> indexes = BubbleSort(v);
     // BubbleSort(v);
-    MergeSort(v);
+    // MergeSort(v);
 
     printVector(v, true);
+    printIndexVector(indexes);
 
     return 0;
 }
