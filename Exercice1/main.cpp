@@ -43,7 +43,7 @@ std::vector<int> useAutoVectorFilling(bool b)
 int main()
 {
 
-    std::vector<int> v = useAutoVectorFilling(false);
+    std::vector<int> v = useAutoVectorFilling(true);
     std::cout << std::endl;
     std::cout << std::endl;
     std::cout << std::endl;
@@ -51,7 +51,7 @@ int main()
     /*
     * Choose which method to use
     */
-    
+
     // BubbleSort(v);
     MergeSort(v);
 
