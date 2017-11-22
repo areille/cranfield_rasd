@@ -1,0 +1,2 @@
+https://stackoverflow.com/questions/8114770/how-to-show-if-condition-on-a-sequence-diagram
+https://www.ibm.com/developerworks/rational/library/3101.html
