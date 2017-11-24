@@ -1,5 +1,9 @@
-import { Class } from './class';
+export class Student {
+    public uuid: String;
+    public ressources: number;
 
-export class Student implements Class {
-
+    constructor(id: String, ressources: number) {
+        this.uuid = id;
+        this.ressources = ressources;
+    }
 }

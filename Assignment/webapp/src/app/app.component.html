@@ -3,8 +3,16 @@
   <div>
     Please enter simulation parameters :
     <div>
-      <label>Amount of students (%):</label>
-      <input type="number" min="0" max="100">
+      <label>Number of students classes :</label>
+      <input [(ngModel)] = "nbClasses" type="number" >
+    </div>
+    <div>
+      <label>Number of students per class :</label>
+      <input type="number" [(ngModel)] = "nbStudentPerClass">
+    </div>
+    <div>
+      <label>Max ressources per class :</label>
+      <input type="number" [(ngModel)] = "maxRessourcesPerClass">
     </div>
     <button type="submit" (click)="launchSimulation();">Start simulation</button>
   </div>
