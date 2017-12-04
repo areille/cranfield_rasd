@@ -1,20 +1,42 @@
 <div>
   <h2>Simulation webapp</h2>
   <div>
-    Please enter simulation parameters :
+    <h3>Please enter simulation parameters :</h3>
     <div>
-      <label>Number of students classes :</label>
-      <input [(ngModel)] = "nbClasses" type="number" >
+      <label>Simulation duration (in weeks):</label>
+      <input [(ngModel)]="simulationDuration" type="number">
     </div>
     <div>
-      <label>Number of students per class :</label>
-      <input type="number" [(ngModel)] = "nbStudentPerClass">
+      <h4>Student parameters :</h4>
+      <div>
+        <label>Number of students classes :</label>
+        <input [(ngModel)]="nbClasses" type="number">
+      </div>
+      <div>
+        <label>Number of students per class :</label>
+        <input type="number" [(ngModel)]="nbStudentPerClass">
+      </div>
+      <div>
+        <label>Max ressources per class :</label>
+        <input type="number" [(ngModel)]="maxRessourcesPerClass">
+      </div>
     </div>
     <div>
-      <label>Max ressources per class :</label>
-      <input type="number" [(ngModel)] = "maxRessourcesPerClass">
+      <h4>HPC system parameters :</h4>
+      <div>
+        <label>Number of nodes :</label>
+        <input [(ngModel)]="nbNode" type="number">
+      </div>
+      <div>
+        <label>Number of cores by node :</label>
+        <input [(ngModel)]="nbCorePerNode" type="number">
+      </div>
+      <div>
+        <label>Total number of cores : </label>
+        {{nbCorePerNode*nbNode}}
+      </div>
     </div>
-    <button type="submit" (click)="launchSimulation();">Start simulation</button>
   </div>
-  
+  <button type="submit" (click)="launchSimulation();">Start simulation</button>
+  <button type="submit" (click)="stopSimulation();">Stop simulation</button>
 </div>
