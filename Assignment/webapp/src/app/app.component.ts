@@ -19,6 +19,7 @@ export class AppComponent implements OnInit {
   title = 'app';
 
   public simulationDuration = 1;
+  public isSimulationStarted = false;
 
   public classes: Class[] = [];
   public nbClasses = 0;
@@ -28,6 +29,9 @@ export class AppComponent implements OnInit {
   private ticks = 0; // value of tick
   private timer;
   private sub: Subscription;
+
+  public time = 0;
+  public showSmallJobs = false;
 
   public nbNode = 128;
   public nbCorePerNode = 16;
@@ -73,11 +77,16 @@ export class AppComponent implements OnInit {
    * Launch a simulation with the parameters
    */
   public launchSimulation() {
-    console.log('Simulation started.');
-    console.log('Monday, 9AM.');
-    this.createClasses();
+    if (this.isSimulationStarted) {
+      console.log('Already a running simulation.')
+    } else {
+      console.log('Simulation started.');
+      console.log('Monday, 9AM.');
+      this.isSimulationStarted = true;
+      this.createClasses();
 
-    this.launchTimer();
+      this.launchTimer();
+    }
   }
 
   public stopSimulation() {
@@ -116,6 +125,7 @@ export class AppComponent implements OnInit {
 
       // Prints out the current time
       console.log('tick : ' + t + ' hour(s) passed.');
+      this.time = t;
 
       this.updateQueues(t);
 
@@ -125,7 +135,15 @@ export class AppComponent implements OnInit {
         if (this.classes[0]) {
           _.forEach(this.classes[0].students, (s: Student) => {
             const id = 'jobtest' + s.uuid;
-            s.jobs = [];
+            s.jobs.push(s.defineJob(id, this.nbCorePerNode, this.nbCoreTot));
+          });
+        }
+        console.log(this.classes);
+      }
+      if (t === 4) {
+        if (this.classes[0]) {
+          _.forEach(this.classes[0].students, (s: Student) => {
+            const id = 'jobtest' + s.uuid;
             s.jobs.push(s.defineJob(id, this.nbCorePerNode, this.nbCoreTot));
           });
         }
@@ -142,31 +160,39 @@ export class AppComponent implements OnInit {
         }
       }
       if (t === 5) {
+        if (this.classes[0]) {
+          _.forEach(this.classes[0].students, (s: Student) => {
+            s.submitJobs();
+          });
+          console.log(this.classes);
+        }
+      }
+      if (t >= 5) {
         this.checkRessources();
       }
 
-      console.log(' ------ Queues : -------');
+      // console.log(' ------ Queues : -------');
 
-      console.log('Small queue :');
-      console.log(this.queueSmall);
-      console.log('Small jobs running :');
-      console.log(this.runningSmallJobs);
-      console.log('Small jobs finished :');
-      console.log(this.finishedSmallJobs);
+      // console.log('Small queue :');
+      // console.log(this.queueSmall);
+      // console.log('Small jobs running :');
+      // console.log(this.runningSmallJobs);
+      // console.log('Small jobs finished :');
+      // console.log(this.finishedSmallJobs);
 
-      console.log('Medium queue :');
-      console.log(this.queueMedium);
-      console.log('Medium jobs running :');
-      console.log(this.runningMediumJobs);
-      console.log('Medium jobs finished :');
-      console.log(this.finishedMediumJobs);
+      // console.log('Medium queue :');
+      // console.log(this.queueMedium);
+      // console.log('Medium jobs running :');
+      // console.log(this.runningMediumJobs);
+      // console.log('Medium jobs finished :');
+      // console.log(this.finishedMediumJobs);
 
-      console.log('Large queue :');
-      console.log(this.queueLarge);
-      console.log('Large jobs running :');
-      console.log(this.runningLargeJobs);
-      console.log('Large jobs finished :');
-      console.log(this.finishedLargeJobs);
+      // console.log('Large queue :');
+      // console.log(this.queueLarge);
+      // console.log('Large jobs running :');
+      // console.log(this.runningLargeJobs);
+      // console.log('Large jobs finished :');
+      // console.log(this.finishedLargeJobs);
 
       // Update boolean isWeekend (mon.9AM to fri.5PM : 104h)
       if (t % 104 === 0 && t !== 0) {

@@ -51,4 +51,24 @@
   </div>
   <button type="submit" (click)="launchSimulation();">Start simulation</button>
   <button type="submit" (click)="stopSimulation();">Stop simulation</button>
+
+  <div>
+    <h2>Simulation live data</h2>
+    <label>Hours of simulation :</label>{{time}}<br/>
+
+    Short jobs : {{queueSmall.length}}  queued, {{runningSmallJobs.length}} running, {{finishedSmallJobs.length}} finished.
+    <br/>
+    Medium jobs : {{queueMedium.length}} queued, {{runningMediumJobs.length}} running, {{finishedMediumJobs.length}} finished.
+    <br/>
+    Large jobs : {{queueLarge.length}} queued, {{runningLargeJobs.length}} running, {{finishedLargeJobs.length}} finished.
+    <br/>
+  </div>
+  <button (click)="showSmallJobs = !showSmallJobs">Show finished small jobs</button>
+  <div *ngIf="showSmallJobs">
+    <div *ngFor="let job of finishedSmallJobs">
+      <label>job id : {{job.uuid}}</label><br/>
+      <label>job start time : {{job.startDate}}</label><br/>
+      <label>job end time : {{job.endDate}}</label><br/>
+    </div>
+  </div>
 </div>

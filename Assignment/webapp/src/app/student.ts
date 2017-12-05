@@ -54,5 +54,6 @@ export class Student {
     constructor(id: String, ressources: number) {
         this.uuid = id;
         this.ressources = ressources;
+        this.jobs = [];
     }
 }
