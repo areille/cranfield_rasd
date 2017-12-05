@@ -4,6 +4,8 @@ export class Job {
     public status: string;
     public cpu: number;
     public runtime: number;
+    public startDate?: number;
+    public endDate?: number;
 
     constructor(id: string, type: string, status: string, cpu: number, runtime: number) {
         this.uuid = id;

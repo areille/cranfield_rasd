@@ -52,6 +52,16 @@ export class AppComponent implements OnInit {
   public queueLarge: Job[] = [];
   public queueHuge: Job[] = [];
 
+  public runningSmallJobs: Job[] = [];
+  public runningMediumJobs: Job[] = [];
+  public runningLargeJobs: Job[] = [];
+  public runningHugeJobs: Job[] = [];
+
+  public finishedSmallJobs: Job[] = [];
+  public finishedMediumJobs: Job[] = [];
+  public finishedLargeJobs: Job[] = [];
+  public finishedHugeJobs: Job[] = [];
+
   private isWeekEnd = false;
 
   ngOnInit(): void {
@@ -107,6 +117,7 @@ export class AppComponent implements OnInit {
       // Prints out the current time
       console.log('tick : ' + t + ' hour(s) passed.');
 
+      this.updateQueues(t);
 
       // Create a job for each student of the first class
       // /!\ Must be done randomly /!\
@@ -122,7 +133,7 @@ export class AppComponent implements OnInit {
       }
 
       // Submit all created jobs
-      if (t === 20) {
+      if (t === 3) {
         if (this.classes[0]) {
           _.forEach(this.classes[0].students, (s: Student) => {
             s.submitJobs();
@@ -130,9 +141,32 @@ export class AppComponent implements OnInit {
           console.log(this.classes);
         }
       }
-      if (t === 25) {
+      if (t === 5) {
         this.checkRessources();
       }
+
+      console.log(' ------ Queues : -------');
+
+      console.log('Small queue :');
+      console.log(this.queueSmall);
+      console.log('Small jobs running :');
+      console.log(this.runningSmallJobs);
+      console.log('Small jobs finished :');
+      console.log(this.finishedSmallJobs);
+
+      console.log('Medium queue :');
+      console.log(this.queueMedium);
+      console.log('Medium jobs running :');
+      console.log(this.runningMediumJobs);
+      console.log('Medium jobs finished :');
+      console.log(this.finishedMediumJobs);
+
+      console.log('Large queue :');
+      console.log(this.queueLarge);
+      console.log('Large jobs running :');
+      console.log(this.runningLargeJobs);
+      console.log('Large jobs finished :');
+      console.log(this.finishedLargeJobs);
 
       // Update boolean isWeekend (mon.9AM to fri.5PM : 104h)
       if (t % 104 === 0 && t !== 0) {
@@ -213,14 +247,80 @@ export class AppComponent implements OnInit {
   public addToQueue(job: Job, queue: Job[]) {
     job.status = 'queued';
     queue.push(job);
-    console.log(queue);
   }
 
-  public updateQueues() {
+  public updateQueues(t) {
+    // update of small queue
     _.forEach(this.queueSmall, (j: Job) => {
-
+      if (_.isEqual(j.status, 'queued') && j.cpu < this.availableCoreS) {
+        j.startDate = t;
+        j.endDate = t + j.runtime;
+        this.availableCoreS -= j.cpu;
+        j.status = 'running';
+      }
     });
-    console.log('Queue up to date.')
+    _.forEach(this.runningSmallJobs, (j: Job) => {
+      if (t === j.endDate) {
+        this.availableCoreS += j.cpu;
+        j.status = 'finished';
+      }
+    });
+    const runningS = _.remove(this.queueSmall, (job: Job) => {
+      return _.isEqual(job.status, 'running');
+    });
+    const finishedS = _.remove(this.runningSmallJobs, (job: Job) => {
+      return _.isEqual(job.status, 'finished');
+    });
+    this.finishedSmallJobs = _.concat(this.finishedSmallJobs, finishedS);
+    this.runningSmallJobs = _.concat(this.runningSmallJobs, runningS);
+
+    // update of medium queue
+    _.forEach(this.queueMedium, (j: Job) => {
+      if (_.isEqual(j.status, 'queued') && j.cpu < this.availableCoreM) {
+        j.startDate = t;
+        j.endDate = t + j.runtime;
+        this.availableCoreM -= j.cpu;
+        j.status = 'running';
+      }
+    });
+    _.forEach(this.runningMediumJobs, (j: Job) => {
+      if (t === j.endDate) {
+        this.availableCoreM += j.cpu;
+        j.status = 'finished';
+      }
+    });
+    const runningM = _.remove(this.queueMedium, (job: Job) => {
+      return _.isEqual(job.status, 'running');
+    });
+    const finishedM = _.remove(this.runningMediumJobs, (job: Job) => {
+      return _.isEqual(job.status, 'finished');
+    });
+    this.finishedMediumJobs = _.concat(this.finishedMediumJobs, finishedM);
+    this.runningMediumJobs = _.concat(this.runningMediumJobs, runningM);
+
+    // update of large queue
+    _.forEach(this.queueLarge, (j: Job) => {
+      if (_.isEqual(j.status, 'queued') && j.cpu < this.availableCoreL) {
+        j.startDate = t;
+        j.endDate = t + j.runtime;
+        this.availableCoreL -= j.cpu;
+        j.status = 'running';
+      }
+    });
+    _.forEach(this.runningLargeJobs, (j: Job) => {
+      if (t === j.endDate) {
+        this.availableCoreL += j.cpu;
+        j.status = 'finished';
+      }
+    });
+    const runningL = _.remove(this.queueLarge, (job: Job) => {
+      return _.isEqual(job.status, 'running');
+    });
+    const finishedL = _.remove(this.runningLargeJobs, (job: Job) => {
+      return _.isEqual(job.status, 'finished');
+    });
+    this.runningLargeJobs = _.concat(this.runningLargeJobs, runningL);
+    this.finishedLargeJobs = _.concat(this.finishedLargeJobs, finishedL);
   }
 
   public updateRessources() {
