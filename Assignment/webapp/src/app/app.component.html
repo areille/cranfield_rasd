@@ -4,7 +4,7 @@
     <h3>Please enter simulation parameters :</h3>
     <div>
       <label>Simulation duration (in weeks):</label>
-      <input [(ngModel)]="simulationDuration" type="number">
+      <input [(ngModel)]="simulationDuration" type="number" (input)="updateHpcRessources()">
     </div>
     <div>
       <h4>Student parameters :</h4>
@@ -25,15 +25,27 @@
       <h4>HPC system parameters :</h4>
       <div>
         <label>Number of nodes :</label>
-        <input [(ngModel)]="nbNode" type="number">
+        <input [(ngModel)]="nbNode" type="number" (input)="updateHpcRessources()">
       </div>
       <div>
         <label>Number of cores by node :</label>
-        <input [(ngModel)]="nbCorePerNode" type="number">
+        <input [(ngModel)]="nbCorePerNode" type="number" (input)="updateHpcRessources()">
       </div>
       <div>
         <label>Total number of cores : </label>
-        {{nbCorePerNode*nbNode}}
+        {{nbCoreTot}}
+        <br/>
+        <label>Number of cores dedicated to short jobs :</label>
+        {{nbCoreS}}
+        <br/>
+        <label>Number of cores dedicated to medium jobs :</label>
+        {{nbCoreM}}
+        <br/>
+        <label>Number of cores dedicated to large jobs :</label>
+        {{nbCoreL}}
+        <br/>
+        <label>Number of core/hour :</label>
+        {{nbCoreTotH}}
       </div>
     </div>
   </div>
