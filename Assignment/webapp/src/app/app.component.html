@@ -17,7 +17,7 @@
         <input type="number" [(ngModel)]="nbStudentPerClass">
       </div>
       <div>
-        <label>Max ressources per class :</label>
+        <label>Max ressources per class (core/hour) :</label>
         <input type="number" [(ngModel)]="maxRessourcesPerClass">
       </div>
     </div>
@@ -54,13 +54,13 @@
 
   <div>
     <h2>Simulation live data</h2>
-    <label>Hours of simulation :</label>{{time}}<br/>
+    <label>Hours of simulation : </label>{{time}}<br/>
 
-    Short jobs : {{queueSmall.length}}  queued, {{runningSmallJobs.length}} running, {{finishedSmallJobs.length}} finished.
+    Short jobs : {{rejectedSmallJobs.length}} rejected, {{queueSmall.length}}  queued, {{runningSmallJobs.length}} running, {{finishedSmallJobs.length}} finished.
     <br/>
-    Medium jobs : {{queueMedium.length}} queued, {{runningMediumJobs.length}} running, {{finishedMediumJobs.length}} finished.
+    Medium jobs : {{rejectedMediumJobs.length}} rejected, {{queueMedium.length}} queued, {{runningMediumJobs.length}} running, {{finishedMediumJobs.length}} finished.
     <br/>
-    Large jobs : {{queueLarge.length}} queued, {{runningLargeJobs.length}} running, {{finishedLargeJobs.length}} finished.
+    Large jobs : {{rejectedLargeJobs.length}} rejected, {{queueLarge.length}} queued, {{runningLargeJobs.length}} running, {{finishedLargeJobs.length}} finished.
     <br/>
   </div>
   <button (click)="showSmallJobs = !showSmallJobs">Show finished small jobs</button>

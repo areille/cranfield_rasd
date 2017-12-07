@@ -3,7 +3,6 @@ import { Job } from './job';
 
 export class Student {
     public uuid: String;
-    public ressources: number;
     public jobs: Job[];
 
     public defineJob(jobId: string, nbCorePerNode: number, nbCore: number) {
@@ -51,9 +50,8 @@ export class Student {
         }
     }
 
-    constructor(id: String, ressources: number) {
+    constructor(id: String) {
         this.uuid = id;
-        this.ressources = ressources;
         this.jobs = [];
     }
 }

@@ -17,40 +17,113 @@ import { $ } from 'protractor';
 })
 export class AppComponent implements OnInit {
   title = 'app';
-
+  // ------------ CLASS VARIABLES -------------
+  /**
+   * Duration of the simulation, in weeks.
+   */
   public simulationDuration = 1;
+
+  /**
+   * Boolean :
+   * - false (default) : no simulation running
+   * - true : a simulation is running
+   */
   public isSimulationStarted = false;
 
+  /**
+   * Array of class. Will contain all classes created by the user.
+   */
   public classes: Class[] = [];
+  /**
+   * The number of classes. Input by the user.
+   */
   public nbClasses = 0;
+  /**
+   * The number of students in each class.
+   */
   public nbStudentPerClass = 0;
+  /**
+   * Ressources allowed per class. In core/hour.
+   */
   public maxRessourcesPerClass: number;
 
-  private ticks = 0; // value of tick
+  /**
+   * Timer.
+   */
   private timer;
+  /**
+   * Subscription to the observable timer.
+   */
   private sub: Subscription;
-
+  /**
+   * Current time. Expressed in hours. Take the value of the timer.
+   * Used for display.
+   */
   public time = 0;
+  /**
+   * Display boolean.
+   */
   public showSmallJobs = false;
-
+  /**
+   * The number of nodes of the HPC system. Default is 128.
+   * Can be modified by the user.
+   */
   public nbNode = 128;
+  /**
+   * The number of core per node. Default is 16.
+   * Can be modified by the user.
+   */
   public nbCorePerNode = 16;
+  /**
+   * Total number of core.
+   */
   public nbCoreTot = this.nbCorePerNode * this.nbNode;
+  /**
+   * Number of cores dedicated to small jobs.
+   */
   public nbCoreS = Math.floor(this.nbCoreTot * 0.1);
+  /**
+   * Number of cores dedicated to medium jobs.
+   */
   public nbCoreM = Math.floor(this.nbCoreTot * 0.3);
+  /**
+   * Number of cores dedicated to large jobs.
+   */
   public nbCoreL = Math.floor(this.nbCoreTot * 0.5);
 
-  // Number of cores per hour tot
+  /**
+   * Total number of core/hour.
+   */
   public nbCoreTotH = this.nbCoreTot * this.simulationDuration * 168;
+  /**
+   * Amount of core/hour available for small jobs.
+   */
   public availableCoreHS = this.nbCoreS * this.simulationDuration * 168;
+  /**
+   * Amount of core/hour available for medium jobs.
+   */
   public availableCoreHM = this.nbCoreM * this.simulationDuration * 168;
+  /**
+   * Amount of core/hour available for large jobs.
+   */
   public availableCoreHL = this.nbCoreL * this.simulationDuration * 168;
 
+  /**
+   * Number of cores available for small jobs. Updated every hour.
+   */
   public availableCoreS = this.nbCoreS;
+  /**
+   * Number of cores available for medium jobs. Updated every hour.
+   */
   public availableCoreM = this.nbCoreM;
+  /**
+   * Number of cores available for large jobs. Updated every hour.
+   */
   public availableCoreL = this.nbCoreL;
 
-
+  /**
+   * Queue of jobs. Array of jobs having the status "queued".
+   */
   public queueSmall: Job[] = [];
   public queueMedium: Job[] = [];
   public queueLarge: Job[] = [];
@@ -65,6 +138,11 @@ export class AppComponent implements OnInit {
   public finishedMediumJobs: Job[] = [];
   public finishedLargeJobs: Job[] = [];
   public finishedHugeJobs: Job[] = [];
+
+  public rejectedSmallJobs: Job[] = [];
+  public rejectedMediumJobs: Job[] = [];
+  public rejectedLargeJobs: Job[] = [];
+  public rejectedHugeJobs: Job[] = [];
 
   private isWeekEnd = false;
 
@@ -90,10 +168,11 @@ export class AppComponent implements OnInit {
   }
 
   public stopSimulation() {
-    if (this.sub) {
+    if (this.sub && this.isSimulationStarted) {
       console.log('Simulation stopped.');
       this.sub.unsubscribe();
       this.classes = [];
+      this.isSimulationStarted = false;
     } else {
       console.clear();
       console.log('No simulation running.')
@@ -110,7 +189,7 @@ export class AppComponent implements OnInit {
       const classId = 'c' + (num + 1)
       for (let i = 0; i < this.nbStudentPerClass; i++) {
         const studentId = classId + 's' + (i + 1);
-        const newStudent = new Student(studentId, this.maxRessourcesPerClass / this.nbStudentPerClass)
+        const newStudent = new Student(studentId)
         students.push(newStudent);
       }
       const newClass = new Class(classId, this.maxRessourcesPerClass, students);
@@ -131,16 +210,11 @@ export class AppComponent implements OnInit {
 
       // Create a job for each student of the first class
       // /!\ Must be done randomly /!\
+
+      // let i = _.random(1, c.students.length)
+      // c.students[i].defineJob()
+
       if (t === 1) {
-        if (this.classes[0]) {
-          _.forEach(this.classes[0].students, (s: Student) => {
-            const id = 'jobtest' + s.uuid;
-            s.jobs.push(s.defineJob(id, this.nbCorePerNode, this.nbCoreTot));
-          });
-        }
-        console.log(this.classes);
-      }
-      if (t === 4) {
         if (this.classes[0]) {
           _.forEach(this.classes[0].students, (s: Student) => {
             const id = 'jobtest' + s.uuid;
@@ -159,14 +233,7 @@ export class AppComponent implements OnInit {
           console.log(this.classes);
         }
       }
-      if (t === 5) {
-        if (this.classes[0]) {
-          _.forEach(this.classes[0].students, (s: Student) => {
-            s.submitJobs();
-          });
-          console.log(this.classes);
-        }
-      }
+
       if (t >= 5) {
         this.checkRessources();
       }
@@ -224,6 +291,12 @@ export class AppComponent implements OnInit {
     this.nbCoreTotH = this.nbCoreTot * this.simulationDuration * 168;
   }
 
+  /**
+   * Checks if submitted jobs can be queued, according to :
+   * - Maximum amount of ressources per class chosen by the IT staff,
+   * - Maximum amount of ressources available on the hpc.
+   * If not, the job get the status "rejected".
+   */
   public checkRessources() {
     if (this.classes) {
       _.forEach(this.classes, (c: Class) => {
@@ -233,32 +306,36 @@ export class AppComponent implements OnInit {
             if (_.isEqual(j.status, 'submitted')) {
               switch (j.type) {
                 case ('short'):
-                  if (v < this.availableCoreHS) {
+                  if (v < this.availableCoreHS && v < c.ressources) {
                     this.addToQueue(j, this.queueSmall);
                     this.availableCoreHS -= v;
                   } else {
                     j.status = 'rejected';
+                    this.rejectedSmallJobs.push(j);
                   }
                   break;
                 case ('medium'):
-                  if (v < this.availableCoreHM) {
+                  if (v < this.availableCoreHM && v < c.ressources) {
                     this.addToQueue(j, this.queueMedium);
                     this.availableCoreHM -= v;
                   } else {
                     j.status = 'rejected';
+                    this.rejectedMediumJobs.push(j);
                   }
                   break;
                 case ('large'):
-                  if (v < this.availableCoreHL) {
+                  if (v < this.availableCoreHL && v < c.ressources) {
                     this.addToQueue(j, this.queueLarge);
                     this.availableCoreHL -= v;
                   } else {
                     j.status = 'rejected';
+                    this.rejectedLargeJobs.push(j);
                   }
                   break;
                 case ('huge'):
                   console.log('TODO')
                   j.status = 'rejected'
+                  this.rejectedHugeJobs.push(j);
                   break;
                 default:
                   console.log('Internal error (line 195)');
@@ -275,7 +352,7 @@ export class AppComponent implements OnInit {
     queue.push(job);
   }
 
-  public updateQueues(t) {
+  public updateQueues(t: number) {
     // update of small queue
     _.forEach(this.queueSmall, (j: Job) => {
       if (_.isEqual(j.status, 'queued') && j.cpu < this.availableCoreS) {
