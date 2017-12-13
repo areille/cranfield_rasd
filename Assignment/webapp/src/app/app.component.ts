@@ -146,6 +146,9 @@ export class AppComponent implements OnInit {
 
   private isWeekEnd = false;
 
+  public idBase: string[] = [];
+  public idCpt = 0;
+
   ngOnInit(): void {
 
   }
@@ -204,62 +207,28 @@ export class AppComponent implements OnInit {
 
       // Prints out the current time
       console.log('tick : ' + t + ' hour(s) passed.');
+      // const testProb = (1 / this.simulationDuration * 168) * Math.exp(-t / (this.simulationDuration * 168)) * 100;
+      const proba = Math.floor(Math.exp(-2 * t / (this.simulationDuration * 168)) * 50);
+      // const testProb = Math.exp(-t / 168) * 100;
+      console.log('Testprob :' + proba);
       this.time = t;
 
       this.updateQueues(t);
 
-      // Create a job for each student of the first class
-      // /!\ Must be done randomly /!\
+      // Create a job for each student of each class, according to the probability
 
-      // let i = _.random(1, c.students.length)
-      // c.students[i].defineJob()
-
-      if (t === 1) {
-        if (this.classes[0]) {
-          _.forEach(this.classes[0].students, (s: Student) => {
-            const id = 'jobtest' + s.uuid;
-            s.jobs.push(s.defineJob(id, this.nbCorePerNode, this.nbCoreTot));
+      if (this.classes) {
+        _.forEach(this.classes, (c: Class) => {
+          _.forEach(c.students, (s: Student) => {
+            if (this.testProba(proba)) {
+              s.jobs.push(s.submitJob(this.generatesId(), this.nbCorePerNode, this.nbCoreTot));
+            }
           });
-        }
+        });
         console.log(this.classes);
       }
 
-      // Submit all created jobs
-      if (t === 3) {
-        if (this.classes[0]) {
-          _.forEach(this.classes[0].students, (s: Student) => {
-            s.submitJobs();
-          });
-          console.log(this.classes);
-        }
-      }
-
-      if (t >= 5) {
-        this.checkRessources();
-      }
-
-      // console.log(' ------ Queues : -------');
-
-      // console.log('Small queue :');
-      // console.log(this.queueSmall);
-      // console.log('Small jobs running :');
-      // console.log(this.runningSmallJobs);
-      // console.log('Small jobs finished :');
-      // console.log(this.finishedSmallJobs);
-
-      // console.log('Medium queue :');
-      // console.log(this.queueMedium);
-      // console.log('Medium jobs running :');
-      // console.log(this.runningMediumJobs);
-      // console.log('Medium jobs finished :');
-      // console.log(this.finishedMediumJobs);
-
-      // console.log('Large queue :');
-      // console.log(this.queueLarge);
-      // console.log('Large jobs running :');
-      // console.log(this.runningLargeJobs);
-      // console.log('Large jobs finished :');
-      // console.log(this.finishedLargeJobs);
+      this.checkRessources();
 
       // Update boolean isWeekend (mon.9AM to fri.5PM : 104h)
       if (t % 104 === 0 && t !== 0) {
@@ -306,29 +275,50 @@ export class AppComponent implements OnInit {
             if (_.isEqual(j.status, 'submitted')) {
               switch (j.type) {
                 case ('short'):
-                  if (v < this.availableCoreHS && v < c.ressources) {
-                    this.addToQueue(j, this.queueSmall);
-                    this.availableCoreHS -= v;
+                  if (v < this.availableCoreHS) {
+                    if (v < c.ressources) {
+                      this.addToQueue(j, this.queueSmall);
+                      this.availableCoreHS -= v;
+                    } else {
+                      j.status = 'rejected';
+                      j.commentary = 'No more ressources for your class (asking :' + v + ', remaining : ' + c.ressources + ')';
+                      this.rejectedSmallJobs.push(j);
+                    }
                   } else {
                     j.status = 'rejected';
+                    j.commentary = 'No more CPU/h available (asking :' + v + ', available :' + this.availableCoreHS + ')';
                     this.rejectedSmallJobs.push(j);
                   }
                   break;
                 case ('medium'):
-                  if (v < this.availableCoreHM && v < c.ressources) {
-                    this.addToQueue(j, this.queueMedium);
-                    this.availableCoreHM -= v;
+                  if (v < this.availableCoreHM) {
+                    if (v < c.ressources) {
+                      this.addToQueue(j, this.queueMedium);
+                      this.availableCoreHM -= v;
+                    } else {
+                      j.status = 'rejected';
+                      j.commentary = 'No more ressources for your class.'
+                      this.rejectedMediumJobs.push(j);
+                    }
                   } else {
                     j.status = 'rejected';
+                    j.commentary = 'No more CPU/h available (asking :' + v + ', available :' + this.availableCoreHM + ')';
                     this.rejectedMediumJobs.push(j);
                   }
                   break;
                 case ('large'):
-                  if (v < this.availableCoreHL && v < c.ressources) {
-                    this.addToQueue(j, this.queueLarge);
-                    this.availableCoreHL -= v;
+                  if (v < this.availableCoreHL) {
+                    if (v < c.ressources) {
+                      this.addToQueue(j, this.queueLarge);
+                      this.availableCoreHL -= v;
+                    } else {
+                      j.status = 'rejected';
+                      j.commentary = 'No more ressources for your class.'
+                      this.rejectedLargeJobs.push(j);
+                    }
                   } else {
                     j.status = 'rejected';
+                    j.commentary = 'No more CPU/h available (asking :' + v + ', available :' + this.availableCoreHL + ')';
                     this.rejectedLargeJobs.push(j);
                   }
                   break;
@@ -355,7 +345,7 @@ export class AppComponent implements OnInit {
   public updateQueues(t: number) {
     // update of small queue
     _.forEach(this.queueSmall, (j: Job) => {
-      if (_.isEqual(j.status, 'queued') && j.cpu < this.availableCoreS) {
+      if (_.isEqual(j.status, 'queued') && j.cpu < this.availableCoreS && !this.isWeekEnd) {
         j.startDate = t;
         j.endDate = t + j.runtime;
         this.availableCoreS -= j.cpu;
@@ -379,7 +369,7 @@ export class AppComponent implements OnInit {
 
     // update of medium queue
     _.forEach(this.queueMedium, (j: Job) => {
-      if (_.isEqual(j.status, 'queued') && j.cpu < this.availableCoreM) {
+      if (_.isEqual(j.status, 'queued') && j.cpu < this.availableCoreM && !this.isWeekEnd) {
         j.startDate = t;
         j.endDate = t + j.runtime;
         this.availableCoreM -= j.cpu;
@@ -403,7 +393,7 @@ export class AppComponent implements OnInit {
 
     // update of large queue
     _.forEach(this.queueLarge, (j: Job) => {
-      if (_.isEqual(j.status, 'queued') && j.cpu < this.availableCoreL) {
+      if (_.isEqual(j.status, 'queued') && j.cpu < this.availableCoreL && !this.isWeekEnd) {
         j.startDate = t;
         j.endDate = t + j.runtime;
         this.availableCoreL -= j.cpu;
@@ -426,12 +416,33 @@ export class AppComponent implements OnInit {
     this.finishedLargeJobs = _.concat(this.finishedLargeJobs, finishedL);
   }
 
-  public updateRessources() {
-    console.log('Ressources up to date.');
-
+  /**
+   * Returns a boolean according to the input percentage :
+   * - true if percentage is 100
+   * - false if percentage is 0
+   * - true or false if percentage is between 1 and 99
+   * @param percentage must be between 0 and 100.
+   */
+  public testProba(percentage: number) {
+    if (percentage === 100) { return true; }
+    if (percentage === 0) { return false; }
+    if (percentage > 0 && percentage < 100) {
+      const value = Math.floor(_.random(1, 99));
+      if (value < percentage) {
+        return true;
+      } else {
+        return false;
+      }
+    }
   }
 
-  public startJob() {
-
+  /**
+   * Generates a new id.
+   */
+  public generatesId() {
+    const id = _.padStart(this.idCpt, 8, '0');
+    this.idCpt++;
+    return id;
   }
 }
+

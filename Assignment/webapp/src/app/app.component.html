@@ -63,12 +63,11 @@
     Large jobs : {{rejectedLargeJobs.length}} rejected, {{queueLarge.length}} queued, {{runningLargeJobs.length}} running, {{finishedLargeJobs.length}} finished.
     <br/>
   </div>
-  <button (click)="showSmallJobs = !showSmallJobs">Show finished small jobs</button>
+  <button (click)="showSmallJobs = !showSmallJobs">Show rejected medium jobs</button>
   <div *ngIf="showSmallJobs">
-    <div *ngFor="let job of finishedSmallJobs">
+    <div *ngFor="let job of rejectedMediumJobs">
       <label>job id : {{job.uuid}}</label><br/>
-      <label>job start time : {{job.startDate}}</label><br/>
-      <label>job end time : {{job.endDate}}</label><br/>
+      <label>Log : "{{job.commentary}}"</label><br/>
     </div>
   </div>
 </div>

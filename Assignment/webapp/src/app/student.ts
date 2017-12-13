@@ -5,8 +5,24 @@ export class Student {
     public uuid: String;
     public jobs: Job[];
 
-    public defineJob(jobId: string, nbCorePerNode: number, nbCore: number) {
-        const jobType = _.random(1, 4);
+    /**
+     * Creates a job and submits it.
+     * @param jobId The id of the job
+     * @param nbCorePerNode Number of cores per node. Used to set a random job cpu value.
+     * @param nbCore Number of cores of the system. Used to set a random job cpu value.
+     */
+    public submitJob(jobId: string, nbCorePerNode: number, nbCore: number) {
+        const rand = _.random(0, 100);
+        let jobType = 1;
+        if (rand > 40) { // between 40 and 100 : 60% chance
+            jobType = 1;
+        } else if (rand > 10) { // between 10 and 40 : 30% chance
+            jobType = 2
+        } else if (rand > 3) { // between 3 and 10 : 7% chance
+            jobType = 3;
+        } else {     // Between 0 and 3 : 3% chance
+            jobType = 4;
+        }
         let type = '';
         let cpu = 0;
         let runtime = 0;
@@ -34,20 +50,8 @@ export class Student {
             default:
                 console.log('Internal system error...');
         }
-        const job = new Job(jobId, type, 'created', cpu, runtime);
+        const job = new Job(jobId, type, 'submitted', cpu, runtime);
         return job;
-    }
-
-    public submitJobs() {
-        if (this.jobs) {
-            _.forEach(this.jobs, (j) => {
-                if (_.isEqual(j.status, 'created')) {
-                    j.status = 'submitted';
-                }
-            });
-        } else {
-            console.log('No job to submit.')
-        }
     }
 
     constructor(id: String) {

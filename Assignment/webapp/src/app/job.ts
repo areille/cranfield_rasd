@@ -6,6 +6,7 @@ export class Job {
     public runtime: number;
     public startDate?: number;
     public endDate?: number;
+    public commentary?: string;
 
     constructor(id: string, type: string, status: string, cpu: number, runtime: number) {
         this.uuid = id;
