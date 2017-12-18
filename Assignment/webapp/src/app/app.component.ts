@@ -6,6 +6,7 @@ import { Class } from './class';
 import { Researcher } from './researcher';
 import { Student } from './student';
 import { Job } from './job';
+import { Queue } from './queue';
 
 import _ from 'lodash';
 import { $ } from 'protractor';
@@ -35,18 +36,17 @@ export class AppComponent implements OnInit {
    */
   public classes: Class[] = [];
   /**
+   * Array of group. Will contain all groups created by the user.
+   */
+  public groups: Group[] = [];
+  /**
    * The number of classes. Input by the user.
    */
   public nbClasses = 0;
   /**
-   * The number of students in each class.
+   * The number of groups. Input by the user.
    */
-  public nbStudentPerClass = 0;
-  /**
-   * Ressources allowed per class. In core/hour.
-   */
-  public maxRessourcesPerClass: number;
-
+  public nbGroups = 0;
   /**
    * Timer.
    */
@@ -97,16 +97,17 @@ export class AppComponent implements OnInit {
   public nbCoreTotH = this.nbCoreTot * this.simulationDuration * 168;
   /**
    * Amount of core/hour available for small jobs.
+   * 104h : MON 9AM to FRI 5PM
    */
-  public availableCoreHS = this.nbCoreS * this.simulationDuration * 168;
+  public availableCoreHS = this.nbCoreS * this.simulationDuration * 104;
   /**
    * Amount of core/hour available for medium jobs.
    */
-  public availableCoreHM = this.nbCoreM * this.simulationDuration * 168;
+  public availableCoreHM = this.nbCoreM * this.simulationDuration * 104;
   /**
    * Amount of core/hour available for large jobs.
    */
-  public availableCoreHL = this.nbCoreL * this.simulationDuration * 168;
+  public availableCoreHL = this.nbCoreL * this.simulationDuration * 104;
 
   /**
    * Number of cores available for small jobs. Updated every hour.
@@ -124,10 +125,10 @@ export class AppComponent implements OnInit {
   /**
    * Queue of jobs. Array of jobs having the status "queued".
    */
-  public queueSmall: Job[] = [];
-  public queueMedium: Job[] = [];
-  public queueLarge: Job[] = [];
-  public queueHuge: Job[] = [];
+  public queueSmall: Queue = new Queue;
+  public queueMedium: Queue = new Queue;
+  public queueLarge: Queue = new Queue;
+  public queueHuge: Queue = new Queue;
 
   public runningSmallJobs: Job[] = [];
   public runningMediumJobs: Job[] = [];
@@ -145,6 +146,7 @@ export class AppComponent implements OnInit {
   public rejectedHugeJobs: Job[] = [];
 
   private isWeekEnd = false;
+  public timeToWE = 104;
 
   public idBase: string[] = [];
   public idCpt = 0;
@@ -174,6 +176,7 @@ export class AppComponent implements OnInit {
       console.log('Simulation stopped.');
       this.sub.unsubscribe();
       this.classes = [];
+      this.groups = [];
       this.isSimulationStarted = false;
     } else {
       console.clear();
@@ -186,33 +189,82 @@ export class AppComponent implements OnInit {
    */
   public updateNbClasses() {
     let index = 0;
-    while (!(this.classes.length === this.nbClasses)) {
-      index = this.classes.length + 1
-      if (this.classes.length < this.nbClasses) {
-        const students: Student[] = [];
-        const classId = 'c' + index;
-        const newClass = new Class(classId);
-        this.classes.push(newClass);
-      } else {
-        this.classes.pop();
+    if (this.nbClasses <= 0) {
+      this.nbClasses = 0;
+      this.classes = [];
+    } else {
+      while (!(this.classes.length === this.nbClasses)) {
+        index = this.classes.length + 1
+        if (this.classes.length < this.nbClasses) {
+          const classId = 'c' + index;
+          const newClass = new Class(classId);
+          this.classes.push(newClass);
+        } else {
+          this.classes.pop();
+        }
       }
     }
-    console.log(this.classes)
+    console.log('Classes : '); console.log(this.classes)
   }
 
   public updateClass(c: Class) {
     let index = 0;
-    while (!(c.students.length === c.nbStudents)) {
-      index = c.students.length + 1
-      if (c.students.length < c.nbStudents) {
-        const studentId = c.uuid + 's' + index;
-        const newStudent = new Student(studentId);
-        c.students.push(newStudent);
-      } else {
-        c.students.pop();
+    if (c.nbStudents <= 0) {
+      c.nbStudents = 0;
+      c.students = [];
+    } else {
+      while (!(c.students.length === c.nbStudents)) {
+        index = c.students.length + 1
+        if (c.students.length < c.nbStudents) {
+          const studentId = c.uuid + 's' + index;
+          const newStudent = new Student(studentId);
+          c.students.push(newStudent);
+        } else {
+          c.students.pop();
+        }
       }
     }
-    console.log(this.classes)
+    console.log('Classes : '); console.log(this.classes)
+  }
+
+  public updateNbGroups() {
+    let index = 0;
+    if (this.nbGroups <= 0) {
+      this.nbGroups = 0;
+      this.groups = [];
+    } else {
+      while (!(this.groups.length === this.nbGroups)) {
+        index = this.groups.length + 1
+        if (this.groups.length < this.nbGroups) {
+          const groupId = 'g' + index;
+          const newGroup = new Group(groupId);
+          this.groups.push(newGroup);
+        } else {
+          this.groups.pop();
+        }
+      }
+    }
+    console.log('Groups : '); console.log(this.groups)
+  }
+
+  public updateGroup(g: Group) {
+    let index = 0;
+    if (g.nbResearchers <= 0) {
+      g.nbResearchers = 0;
+      g.researchers = [];
+    } else {
+      while (!(g.researchers.length === g.nbResearchers)) {
+        index = g.researchers.length + 1
+        if (g.researchers.length < g.nbResearchers) {
+          const researcherId = g.uuid + 'r' + index;
+          const newResearcher = new Researcher(researcherId);
+          g.researchers.push(newResearcher);
+        } else {
+          g.researchers.pop();
+        }
+      }
+    }
+    console.log('Groups : '); console.log(this.groups)
   }
 
   public launchTimer() {
@@ -229,6 +281,10 @@ export class AppComponent implements OnInit {
 
       this.updateQueues(t);
 
+      if (!this.isWeekEnd) {
+        this.timeToWE--;
+      }
+
       // Create a job for each student of each class, according to the probability
 
       if (this.classes) {
@@ -241,6 +297,15 @@ export class AppComponent implements OnInit {
         });
         console.log(this.classes);
       }
+      if (this.groups) {
+        _.forEach(this.groups, (g: Group) => {
+          _.forEach(g.researchers, (r: Researcher) => {
+            if (this.testProba(proba)) {
+              r.jobs.push(r.submitJob(this.generatesId(), this.nbCorePerNode, this.nbCoreTot));
+            }
+          });
+        });
+      }
 
       this.checkRessources();
 
@@ -252,6 +317,7 @@ export class AppComponent implements OnInit {
       // Update boolean isWeekend (fri.5PM to mon.9AM : 64h + 104h = 168h)
       if (t % 168 === 0 && t !== 0) {
         this.isWeekEnd = false;
+        this.timeToWE = 104;
         console.log('C\'est plus le weekend');
       }
 
@@ -277,6 +343,7 @@ export class AppComponent implements OnInit {
   /**
    * Checks if submitted jobs can be queued, according to :
    * - Maximum amount of ressources per class chosen by the IT staff,
+   * - Available time until weekend
    * - Maximum amount of ressources available on the hpc.
    * If not, the job get the status "rejected".
    */
@@ -289,52 +356,187 @@ export class AppComponent implements OnInit {
             if (_.isEqual(j.status, 'submitted')) {
               switch (j.type) {
                 case ('short'):
-                  if (v < this.availableCoreHS) {
-                    if (v < c.ressources) {
-                      this.addToQueue(j, this.queueSmall);
-                      this.availableCoreHS -= v;
+                  // if (j.cpu < this.availableCoreS) {
+                    if (j.runtime < this.timeToWE) {
+                      if (!c.ressources) {
+                        this.queueSmall.add(j);
+                        console.log('Petite queue'); console.log(this.queueSmall);
+                        // this.availableCoreHS -= v;
+                      } else {
+                        if (v < c.ressources) {
+                          this.queueSmall.add(j);
+                          // this.availableCoreHS -= v;
+                        } else {
+                          j.status = 'rejected';
+                          j.commentary = 'No more ressources for your class (asking :' + v + ', remaining : ' + c.ressources + ')';
+                          this.rejectedSmallJobs.push(j);
+                        }
+                      }
                     } else {
                       j.status = 'rejected';
-                      j.commentary = 'No more ressources for your class (asking :' + v + ', remaining : ' + c.ressources + ')';
+                      j.commentary = 'No more time before weekend... Try next week.'
                       this.rejectedSmallJobs.push(j);
                     }
-                  } else {
-                    j.status = 'rejected';
-                    j.commentary = 'No more CPU/h available (asking :' + v + ', available :' + this.availableCoreHS + ')';
-                    this.rejectedSmallJobs.push(j);
-                  }
+                  // } else {
+                  //   j.status = 'rejected';
+                  //   j.commentary = 'No more CPU available (asking :' + v + ', available :' + this.availableCoreS + ')';
+                  //   this.rejectedSmallJobs.push(j);
+                  // }
                   break;
                 case ('medium'):
-                  if (v < this.availableCoreHM) {
-                    if (v < c.ressources) {
-                      this.addToQueue(j, this.queueMedium);
-                      this.availableCoreHM -= v;
+                  // if (j.cpu < this.availableCoreM) {
+                    if (j.runtime < this.timeToWE) {
+                      if (!c.ressources) {
+                        this.queueMedium.add(j);
+                        // this.availableCoreM -= j.cpu;
+                      } else {
+                        if (v < c.ressources) {
+                          this.queueMedium.add(j);
+                          // this.availableCoreM -= j.cpu;
+                        } else {
+                          j.status = 'rejected';
+                          j.commentary = 'No more ressources for your class (asking :' + v + ', remaining : ' + c.ressources + ')';
+                          this.rejectedMediumJobs.push(j);
+                        }
+                      }
                     } else {
                       j.status = 'rejected';
-                      j.commentary = 'No more ressources for your class.'
+                      j.commentary = 'No more time before weekend... Try next week.'
                       this.rejectedMediumJobs.push(j);
                     }
-                  } else {
-                    j.status = 'rejected';
-                    j.commentary = 'No more CPU/h available (asking :' + v + ', available :' + this.availableCoreHM + ')';
-                    this.rejectedMediumJobs.push(j);
-                  }
+                  // } else {
+                  //   j.status = 'rejected';
+                  //   j.commentary = 'No more CPU available (asking :' + v + ', available :' + this.availableCoreM + ')';
+                  //   this.rejectedMediumJobs.push(j);
+                  // }
                   break;
                 case ('large'):
-                  if (v < this.availableCoreHL) {
-                    if (v < c.ressources) {
-                      this.addToQueue(j, this.queueLarge);
-                      this.availableCoreHL -= v;
+                  // if (j.cpu < this.availableCoreL) {
+                    if (j.runtime < this.timeToWE) {
+                      if (!c.ressources) {
+                        this.queueLarge.add(j);
+                        // this.availableCoreL -= j.cpu;
+                      } else {
+                        if (v < c.ressources) {
+                          this.queueLarge.add(j);
+                          // this.availableCoreL -= j.cpu;
+                        } else {
+                          j.status = 'rejected';
+                          j.commentary = 'No more ressources for your class (asking :' + v + ', remaining : ' + c.ressources + ')';
+                          this.rejectedLargeJobs.push(j);
+                        }
+                      }
                     } else {
                       j.status = 'rejected';
-                      j.commentary = 'No more ressources for your class.'
+                      j.commentary = 'No more time before weekend... Try next week.'
                       this.rejectedLargeJobs.push(j);
                     }
-                  } else {
-                    j.status = 'rejected';
-                    j.commentary = 'No more CPU/h available (asking :' + v + ', available :' + this.availableCoreHL + ')';
-                    this.rejectedLargeJobs.push(j);
-                  }
+                  // } else {
+                  //   j.status = 'rejected';
+                  //   j.commentary = 'No more CPU available (asking :' + v + ', available :' + this.availableCoreL + ')';
+                  //   this.rejectedLargeJobs.push(j);
+                  // }
+                  break;
+                case ('huge'):
+                  console.log('TODO')
+                  j.status = 'rejected'
+                  this.rejectedHugeJobs.push(j);
+                  break;
+                default:
+                  console.log('Internal error (line 195)');
+              }
+            }
+          });
+        });
+      });
+    }
+    if (this.groups) {
+      _.forEach(this.groups, (g: Group) => {
+        _.forEach(g.researchers, (r: Researcher) => {
+          _.forEach(r.jobs, (j: Job) => {
+            const v = j.cpu * j.runtime;
+            if (_.isEqual(j.status, 'submitted')) {
+              switch (j.type) {
+                case ('short'):
+                  // if (j.cpu < this.availableCoreS) {
+                    if (j.runtime < this.timeToWE) {
+                      if (!g.ressources) {
+                        this.queueSmall.add(j);
+                        // this.availableCoreS -= j.cpu;
+                      } else {
+                        if (v < g.ressources) {
+                          this.queueSmall.add(j);
+                          // this.availableCoreS -= j.cpu;
+                        } else {
+                          j.status = 'rejected';
+                          j.commentary = 'No more ressources for your group (asking :' + j.cpu + ', remaining : ' + g.ressources + ')';
+                          this.rejectedSmallJobs.push(j);
+                        }
+                      }
+                    } else {
+                      j.status = 'rejected';
+                      j.commentary = 'No more time before weekend... Try next week.'
+                      this.rejectedSmallJobs.push(j);
+                    }
+                  // } else {
+                  //   j.status = 'rejected';
+                  //   j.commentary = 'No more CPU available (asking :' + j.cpu + ', available :' + this.availableCoreS + ')';
+                  //   this.rejectedSmallJobs.push(j);
+                  // }
+                  break;
+                case ('medium'):
+                  // if (j.cpu < this.availableCoreM) {
+                    if (j.runtime < this.timeToWE) {
+                      if (!g.ressources) {
+                        this.queueMedium.add(j);
+                        // this.availableCoreM -= j.cpu;
+                      } else {
+                        if (v < g.ressources) {
+                          this.queueMedium.add(j);
+                          // this.availableCoreM -= j.cpu;
+                        } else {
+                          j.status = 'rejected';
+                          j.commentary = 'No more ressources for your group (asking :' + j.cpu + ', remaining : ' + g.ressources + ')';
+                          this.rejectedMediumJobs.push(j);
+                        }
+                      }
+                    } else {
+                      j.status = 'rejected';
+                      j.commentary = 'No more time before weekend... Try next week.'
+                      this.rejectedMediumJobs.push(j);
+                    }
+                  // } else {
+                  //   j.status = 'rejected';
+                  //   j.commentary = 'No more CPU available (asking :' + j.cpu + ', available :' + this.availableCoreM + ')';
+                  //   this.rejectedMediumJobs.push(j);
+                  // }
+                  break;
+                case ('large'):
+                  // if (j.cpu < this.availableCoreL) {
+                    if (j.runtime < this.timeToWE) {
+                      if (!g.ressources) {
+                        this.queueLarge.add(j);
+                        // this.availableCoreL -= j.cpu;
+                      } else {
+                        if (v < g.ressources) {
+                          this.queueLarge.add(j);
+                          // this.availableCoreL -= j.cpu;
+                        } else {
+                          j.status = 'rejected';
+                          j.commentary = 'No more ressources for your group (asking :' + j.cpu + ', remaining : ' + g.ressources + ')';
+                          this.rejectedLargeJobs.push(j);
+                        }
+                      }
+                    } else {
+                      j.status = 'rejected';
+                      j.commentary = 'No more time before weekend... Try next week.'
+                      this.rejectedLargeJobs.push(j);
+                    }
+                  // } else {
+                  //   j.status = 'rejected';
+                  //   j.commentary = 'No more CPU available (asking :' + j.cpu + ', available :' + this.availableCoreL + ')';
+                  //   this.rejectedLargeJobs.push(j);
+                  // }
                   break;
                 case ('huge'):
                   console.log('TODO')
@@ -351,18 +553,13 @@ export class AppComponent implements OnInit {
     }
   }
 
-  public addToQueue(job: Job, queue: Job[]) {
-    job.status = 'queued';
-    queue.push(job);
-  }
-
   public updateQueues(t: number) {
     // update of small queue
     _.forEach(this.queueSmall, (j: Job) => {
-      if (_.isEqual(j.status, 'queued') && j.cpu < this.availableCoreS && !this.isWeekEnd) {
+      if (_.isEqual(j.status, 'queued')) {
         j.startDate = t;
         j.endDate = t + j.runtime;
-        this.availableCoreS -= j.cpu;
+        // this.availableCoreS -= j.cpu;
         j.status = 'running';
       }
     });
@@ -383,7 +580,7 @@ export class AppComponent implements OnInit {
 
     // update of medium queue
     _.forEach(this.queueMedium, (j: Job) => {
-      if (_.isEqual(j.status, 'queued') && j.cpu < this.availableCoreM && !this.isWeekEnd) {
+      if (_.isEqual(j.status, 'queued') && j.cpu < this.availableCoreM) {
         j.startDate = t;
         j.endDate = t + j.runtime;
         this.availableCoreM -= j.cpu;
@@ -407,7 +604,7 @@ export class AppComponent implements OnInit {
 
     // update of large queue
     _.forEach(this.queueLarge, (j: Job) => {
-      if (_.isEqual(j.status, 'queued') && j.cpu < this.availableCoreL && !this.isWeekEnd) {
+      if (_.isEqual(j.status, 'queued') && j.cpu < this.availableCoreL) {
         j.startDate = t;
         j.endDate = t + j.runtime;
         this.availableCoreL -= j.cpu;

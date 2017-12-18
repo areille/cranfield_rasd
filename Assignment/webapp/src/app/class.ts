@@ -1,5 +1,4 @@
 import { Student } from './student';
-import _ from 'lodash';
 
 export class Class {
     public uuid: String;

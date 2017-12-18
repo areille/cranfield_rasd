@@ -1,8 +1,14 @@
 import { Researcher } from './researcher';
 
 export class Group {
-    public groupId: number;
-    public groupName: string;
-    public ressources: number;
+    public uuid: String;
+    public ressources?: number;
+    public nbResearchers: number;
     public researchers: Researcher[];
+
+    constructor(groupId: String) {
+        this.uuid = groupId;
+        this.nbResearchers = 0;
+        this.researchers = [];
+    }
 }
