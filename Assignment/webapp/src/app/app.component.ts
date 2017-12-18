@@ -164,7 +164,6 @@ export class AppComponent implements OnInit {
       console.log('Simulation started.');
       console.log('Monday, 9AM.');
       this.isSimulationStarted = true;
-      this.createClasses();
 
       this.launchTimer();
     }
@@ -185,20 +184,35 @@ export class AppComponent implements OnInit {
   /**
    * Creates classes with input data.
    */
-  public createClasses() {
-    this.classes = [];
-    for (let num = 0; num < this.nbClasses; num++) {
-      const students: Student[] = [];
-      const classId = 'c' + (num + 1)
-      for (let i = 0; i < this.nbStudentPerClass; i++) {
-        const studentId = classId + 's' + (i + 1);
-        const newStudent = new Student(studentId)
-        students.push(newStudent);
+  public updateNbClasses() {
+    let index = 0;
+    while (!(this.classes.length === this.nbClasses)) {
+      index = this.classes.length + 1
+      if (this.classes.length < this.nbClasses) {
+        const students: Student[] = [];
+        const classId = 'c' + index;
+        const newClass = new Class(classId);
+        this.classes.push(newClass);
+      } else {
+        this.classes.pop();
       }
-      const newClass = new Class(classId, this.maxRessourcesPerClass, students);
-      this.classes.push(newClass);
     }
-    console.log(this.classes);
+    console.log(this.classes)
+  }
+
+  public updateClass(c: Class) {
+    let index = 0;
+    while (!(c.students.length === c.nbStudents)) {
+      index = c.students.length + 1
+      if (c.students.length < c.nbStudents) {
+        const studentId = c.uuid + 's' + index;
+        const newStudent = new Student(studentId);
+        c.students.push(newStudent);
+      } else {
+        c.students.pop();
+      }
+    }
+    console.log(this.classes)
   }
 
   public launchTimer() {
@@ -445,4 +459,3 @@ export class AppComponent implements OnInit {
     return id;
   }
 }
-
