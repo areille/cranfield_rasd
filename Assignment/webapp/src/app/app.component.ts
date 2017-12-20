@@ -398,9 +398,17 @@ export class AppComponent implements OnInit {
                   }
                   break;
                 case ('huge'):
-                  console.log('TODO')
-                  j.status = 'rejected'
-                  this.rejectedHugeJobs.push(j);
+                  if (!c.ressources) {
+                    this.queueHuge.add(j, time);
+                  } else {
+                    if (v < c.ressources) {
+                      this.queueLarge.add(j, time);
+                    } else {
+                      j.status = 'rejected';
+                      j.commentary = 'No more ressources for your class (asking :' + v + ', remaining : ' + c.ressources + ')';
+                      this.rejectedHugeJobs.push(j);
+                    }
+                  }
                   break;
                 default:
                   console.log('Internal error (line 195)');
@@ -457,9 +465,17 @@ export class AppComponent implements OnInit {
                   }
                   break;
                 case ('huge'):
-                  console.log('TODO')
-                  j.status = 'rejected'
-                  this.rejectedHugeJobs.push(j);
+                  if (!g.ressources) {
+                    this.queueHuge.add(j, time);
+                  } else {
+                    if (v < g.ressources) {
+                      this.queueLarge.add(j, time);
+                    } else {
+                      j.status = 'rejected';
+                      j.commentary = 'No more ressources for your group (asking :' + v + ', remaining : ' + g.ressources + ')';
+                      this.rejectedHugeJobs.push(j);
+                    }
+                  }
                   break;
                 default:
                   console.log('Internal error (line 195)');
