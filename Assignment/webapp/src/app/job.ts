@@ -4,6 +4,7 @@ export class Job {
     public status: string;
     public cpu: number;
     public runtime: number;
+    public queueDate?: number;
     public startDate?: number;
     public endDate?: number;
     public commentary?: string;
