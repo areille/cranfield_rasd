@@ -92,25 +92,9 @@ export class AppComponent implements OnInit {
   public nbCoreL = Math.floor(this.nbCoreTot * 0.5);
 
   /**
-   * Total number of core/hour.
+   * Number of cores dedicated to huge jobs
    */
-  public nbCoreTotH = this.nbCoreTot * 168;
-  // /**
-  //  * Amount of core/hour available for small jobs.
-  //  * 104h : MON 9AM to FRI 5PM
-  //  */
-  // public availableCoreHS = this.nbCoreS * 104;
-  // public wastedCoreHS = 0;
-  // /**
-  //  * Amount of core/hour available for medium jobs.
-  //  */
-  // public availableCoreHM = this.nbCoreM * 104;
-  // public wastedCoreHM = 0;
-  // /**
-  //  * Amount of core/hour available for large jobs.
-  //  */
-  // public availableCoreHL = this.nbCoreL * 104;
-  // public wastedCoreHL = 0;
+  public nbCoreH = this.nbCoreTot;
 
   /**
    * Number of cores available for small jobs. Updated every hour.
@@ -124,6 +108,10 @@ export class AppComponent implements OnInit {
    * Number of cores available for large jobs. Updated every hour.
    */
   public availableCoreL = this.nbCoreL;
+  /**
+  * Number of cores available for huge jobs. Updated every hour.
+  */
+  public availableCoreH = this.nbCoreH;
 
   /**
    * Queue of jobs. Array of jobs having the status "queued".
@@ -150,12 +138,15 @@ export class AppComponent implements OnInit {
 
   private isWeekEnd = false;
   public timeToWE = 104;
+  public timeToWeek = 64;
+  // week number
+  public weeknumber = 0;
 
-  public idBase: string[] = [];
   public idCpt = 0;
 
-  ngOnInit(): void {
+  public textOutput: String;
 
+  ngOnInit(): void {
   }
 
 
@@ -169,6 +160,7 @@ export class AppComponent implements OnInit {
       console.log('Simulation started.');
       console.log('Monday, 9AM.');
       this.isSimulationStarted = true;
+      this.weeknumber = 1;
 
       this.launchTimer();
     }
@@ -271,21 +263,24 @@ export class AppComponent implements OnInit {
   }
 
   public launchTimer() {
-    this.timer = Observable.timer(2000, 1000);
+    this.timer = Observable.timer(2000, 200);
     this.sub = this.timer.subscribe((t) => {
 
       // Prints out the current time
-      console.log('tick : ' + t + ' hour(s) passed.');
+      // console.log('tick : ' + t + ' hour(s) passed.');
       // const testProb = (1 / this.simulationDuration * 168) * Math.exp(-t / (this.simulationDuration * 168)) * 100;
-      const proba = Math.floor(Math.exp(-2 * t / (this.simulationDuration * 168)) * 50);
+      // const proba = Math.floor(Math.exp(-2 * t / (this.simulationDuration * 168)) * 50);
+      const proba = Math.floor(Math.exp(-2 * t / (168)) * 50);
       // const testProb = Math.exp(-t / 168) * 100;
-      console.log('Testprob :' + proba);
+      // console.log('Testprob :' + proba);
       this.time = t;
 
       this.updateQueues(t);
 
       if (!this.isWeekEnd) {
         this.timeToWE--;
+      } else {
+        this.timeToWeek--;
       }
 
       // Create a job for each student of each class, according to the probability
@@ -313,12 +308,14 @@ export class AppComponent implements OnInit {
       this.checkRessources(t);
 
       // Update boolean isWeekend (mon.9AM to fri.5PM : 104h)
-      if (t % 104 === 0 && t !== 0) {
+      if (t % 168 === 104 && t !== 0) {
         this.isWeekEnd = true;
+        this.timeToWeek = 64;
         console.log('C\'est le weekend');
       }
       // Update boolean isWeekend (fri.5PM to mon.9AM : 64h + 104h = 168h)
       if (t % 168 === 0 && t !== 0) {
+        this.weeknumber++;
         this.isWeekEnd = false;
         this.timeToWE = 104;
         console.log('C\'est plus le weekend');
@@ -340,7 +337,6 @@ export class AppComponent implements OnInit {
     this.nbCoreS = Math.floor(this.nbCoreTot * 0.1);
     this.nbCoreM = Math.floor(this.nbCoreTot * 0.3);
     this.nbCoreL = Math.floor(this.nbCoreTot * 0.5);
-    this.nbCoreTotH = this.nbCoreTot * this.simulationDuration * 168;
   }
 
   /**
@@ -402,7 +398,7 @@ export class AppComponent implements OnInit {
                     this.queueHuge.add(j, time);
                   } else {
                     if (v < c.ressources) {
-                      this.queueLarge.add(j, time);
+                      this.queueHuge.add(j, time);
                     } else {
                       j.status = 'rejected';
                       j.commentary = 'No more ressources for your class (asking :' + v + ', remaining : ' + c.ressources + ')';
@@ -469,7 +465,7 @@ export class AppComponent implements OnInit {
                     this.queueHuge.add(j, time);
                   } else {
                     if (v < g.ressources) {
-                      this.queueLarge.add(j, time);
+                      this.queueHuge.add(j, time);
                     } else {
                       j.status = 'rejected';
                       j.commentary = 'No more ressources for your group (asking :' + v + ', remaining : ' + g.ressources + ')';
@@ -486,12 +482,17 @@ export class AppComponent implements OnInit {
       });
     }
   }
+
+
   public updateQueues(t: number) {
-    // update of small queue
 
     this.queueSmall.update(this.runningSmallJobs);
     this.queueMedium.update(this.runningMediumJobs);
     this.queueLarge.update(this.runningLargeJobs);
+    this.queueHuge.update(this.runningHugeJobs);
+
+    // update of small queue
+
     // Set queued jobs to running
     _.forEach(this.queueSmall.jobs, (j: Job) => {
       if (_.isEqual(j.status, 'queued') && j.cpu < this.availableCoreS && j.runtime < this.timeToWE) {
@@ -565,6 +566,30 @@ export class AppComponent implements OnInit {
     });
     this.runningLargeJobs = _.concat(this.runningLargeJobs, runningL);
     this.finishedLargeJobs = _.concat(this.finishedLargeJobs, finishedL);
+
+    // update of huge queue
+    _.forEach(this.queueHuge.jobs, (j: Job) => {
+      if (_.isEqual(j.status, 'queued') && j.cpu < this.availableCoreH && this.isWeekEnd && j.runtime < this.timeToWeek) {
+        j.startDate = t;
+        j.endDate = t + j.runtime;
+        this.availableCoreH -= j.cpu;
+        j.status = 'running';
+      }
+    });
+
+    _.forEach(this.runningHugeJobs, (j: Job) => {
+      if (t === j.endDate) {
+        this.availableCoreH += j.cpu;
+        j.status = 'finished';
+      }
+    });
+
+    const runningH = this.queueHuge.removeRunnings();
+    const finishedH = _.remove(this.runningHugeJobs, (job: Job) => {
+      return _.isEqual(job.status, 'finished');
+    });
+    this.runningHugeJobs = _.concat(this.runningHugeJobs, runningH);
+    this.finishedHugeJobs = _.concat(this.finishedHugeJobs, finishedH);
   }
 
   /**

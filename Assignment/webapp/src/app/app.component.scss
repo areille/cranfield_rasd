@@ -2,9 +2,28 @@ div{
     *{
         font-family:monospace
     }
+    
+}
+
+.parameters{
+    display: flex;
+    justify-content: space-around;
     .classes{
         border: solid 1px lightgray;
         margin: 4px;
         padding: 2px;
+    }
+}
+.buttons{
+    text-align: center;
+    button{
+        margin: 20px;
+    }
+}
+
+.output{
+    textarea{
+        width: 100%;
+        min-height: 100px;
     }
 }

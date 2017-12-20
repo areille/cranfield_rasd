@@ -1,42 +1,44 @@
-<div>
+<div style="height: 100%">
   <h2>Simulation webapp</h2>
-  <div>
-    <h3>Please enter simulation parameters :</h3>
+  <div class="parameters">
     <div>
-      <label>Simulation duration (in weeks):</label>
-      <input [(ngModel)]="simulationDuration" type="number" (input)="updateHpcRessources()">
-    </div>
-    <div>
-      <h4>Student parameters :</h4>
+      <h3>Please enter simulation parameters :</h3>
       <div>
-        <label>Number of students classes :</label>
-        <input [(ngModel)]="nbClasses" type="number" min="0" (input)="updateNbClasses()">
+        <label>Simulation duration (in weeks):</label>
+        <input [(ngModel)]="simulationDuration" type="number" (input)="updateHpcRessources()">
       </div>
-      <div class="classes" *ngFor="let class of classes; let i=index">
-        <div>
-          <label>Number of students for class n° {{i+1}}:</label>
-          <input type="number" [(ngModel)]="class.nbStudents" min="0" (input)="updateClass(class)">
-        </div>
-        <div>
-          <label>Max ressources per class (core/hour) :</label>
-          <input type="number" min="0" [(ngModel)]="class.ressources">
-        </div>
-      </div>
-    </div>
-    <div>
-      <h4>Researchers parameters :</h4>
       <div>
-        <label>Number of researchers groups :</label>
-        <input [(ngModel)]="nbGroups" type="number" min="0" (input)="updateNbGroups()">
-      </div>
-      <div class="classes" *ngFor="let group of groups; let i=index">
+        <h4>Student parameters :</h4>
         <div>
-          <label>Number of researchers for group n° {{i+1}}:</label>
-          <input type="number" min="0" [(ngModel)]="group.nbResearchers" (input)="updateGroup(group)">
+          <label>Number of students classes :</label>
+          <input [(ngModel)]="nbClasses" type="number" min="0" (input)="updateNbClasses()">
         </div>
+        <div class="classes" *ngFor="let class of classes; let i=index">
+          <div>
+            <label>Number of students for class n° {{i+1}}:</label>
+            <input type="number" [(ngModel)]="class.nbStudents" min="0" (input)="updateClass(class)">
+          </div>
+          <div>
+            <label>Max ressources per class (core/hour) :</label>
+            <input type="number" min="0" [(ngModel)]="class.ressources">
+          </div>
+        </div>
+      </div>
+      <div>
+        <h4>Researchers parameters :</h4>
         <div>
-          <label>Max ressources per class (core/hour) :</label>
-          <input type="number" min="0" [(ngModel)]="group.ressources">
+          <label>Number of researchers groups :</label>
+          <input [(ngModel)]="nbGroups" type="number" min="0" (input)="updateNbGroups()">
+        </div>
+        <div class="classes" *ngFor="let group of groups; let i=index">
+          <div>
+            <label>Number of researchers for group n° {{i+1}}:</label>
+            <input type="number" min="0" [(ngModel)]="group.nbResearchers" (input)="updateGroup(group)">
+          </div>
+          <div>
+            <label>Max ressources per class (core/hour) :</label>
+            <input type="number" min="0" [(ngModel)]="group.ressources">
+          </div>
         </div>
       </div>
     </div>
@@ -63,34 +65,32 @@
         <label>Number of cores dedicated to large jobs :</label>
         {{nbCoreL}}
         <br/>
-        <label>Number of core/hour :</label>
-        {{nbCoreTotH}}
       </div>
     </div>
   </div>
-  <button type="submit" (click)="launchSimulation();">Start simulation</button>
-  <button type="submit" (click)="stopSimulation();">Stop simulation</button>
+  <div class="buttons">
+    <button type="submit" (click)="launchSimulation();">Start simulation</button>
+    <button type="submit" (click)="stopSimulation();">Stop simulation</button>
+  </div>
 
   <div>
     <h2>Simulation live data</h2>
-    <label>Hours of simulation : </label>{{time}}
+    <label>Hours of simulation : </label>{{time}} ,
+    <label *ngIf="!isWeekEnd" style="color:green">Week</label>
+    <label *ngIf="isWeekEnd" style="color:red">Weekend</label> {{weeknumber}},
     <br/> Short jobs : {{rejectedSmallJobs.length}} rejected, {{queueSmall.jobs.length}} queued, {{runningSmallJobs.length}} running,
     {{finishedSmallJobs.length}} finished.
-    <br/> Medium jobs : {{rejectedMediumJobs.length}} rejected, {{queueMedium.jobs.length}} queued, {{runningMediumJobs.length}} running,
-    {{finishedMediumJobs.length}} finished.
+    <br/> Medium jobs : {{rejectedMediumJobs.length}} rejected, {{queueMedium.jobs.length}} queued, {{runningMediumJobs.length}}
+    running, {{finishedMediumJobs.length}} finished.
     <br/> Large jobs : {{rejectedLargeJobs.length}} rejected, {{queueLarge.jobs.length}} queued, {{runningLargeJobs.length}} running,
     {{finishedLargeJobs.length}} finished.
     <br/> Huge jobs : {{rejectedHugeJobs.length}} rejected, {{queueHuge.jobs.length}} queued, {{runningHugeJobs.length}} running,
-    {{finishedhugeJobs.length}} finished.
+    {{finishedHugeJobs.length}} finished.
     <br/>
   </div>
-  <button (click)="showSmallJobs = !showSmallJobs">Show rejected medium jobs</button>
-  <div *ngIf="showSmallJobs">
-    <div *ngFor="let job of rejectedMediumJobs">
-      <label>job id : {{job.uuid}}</label>
-      <br/>
-      <label>Log : "{{job.commentary}}"</label>
-      <br/>
-    </div>
+
+  <div class="output">
+    <h2>Output</h2>
+    <textarea [(ngModel)]="textOutput"></textarea>
   </div>
 </div>
