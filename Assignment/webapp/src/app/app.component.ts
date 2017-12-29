@@ -61,10 +61,6 @@ export class AppComponent implements OnInit {
    */
   public time = 0;
   /**
-   * Display boolean.
-   */
-  public showSmallJobs = false;
-  /**
    * The number of nodes of the HPC system. Default is 128.
    * Can be modified by the user.
    */
@@ -140,11 +136,18 @@ export class AppComponent implements OnInit {
   public timeToWE = 104;
   public timeToWeek = 64;
   // week number
-  public weeknumber = 0;
+  public weeknumber = 1;
 
   public idCpt = 0;
 
-  public textOutput: String;
+  /**
+  * Number of small jobs performed per week
+  */
+  public nbSperW: number[] = [];
+  public nbMperW: number[] = [];
+  public nbLperW: number[] = [];
+  public nbHperW: number[] = [];
+  public textOutput: String = '-------- SIMULATION RESULTS ------- \n \n';
 
   ngOnInit(): void {
   }
@@ -160,7 +163,23 @@ export class AppComponent implements OnInit {
       console.log('Simulation started.');
       console.log('Monday, 9AM.');
       this.isSimulationStarted = true;
-      this.weeknumber = 1;
+
+      this.textOutput += 'Simulation duration : ' + this.simulationDuration + '\n\n';
+      this.textOutput += 'Number of nodes : ' + this.nbNode + '\n';
+      this.textOutput += 'Number of cores : ' + this.nbCorePerNode + '\n';
+      this.textOutput += 'Total number of cores : ' + this.nbCoreTot + '\n\n';
+      this.textOutput += 'Number of students classes : ' + this.nbClasses + '\n';
+      let studentTot = 0;
+      _.forEach(this.classes, (c) => {
+        studentTot += c.nbStudents;
+      });
+      this.textOutput += 'Total number of students : ' + studentTot + '\n\n'
+      this.textOutput += 'Number of researchers groups : ' + this.nbGroups + '\n';
+      let researchersTot = 0;
+      _.forEach(this.groups, (g) => {
+        researchersTot += g.nbResearchers;
+      });
+      this.textOutput += 'Total number of researchers : ' + researchersTot + '\n\n';
 
       this.launchTimer();
     }
@@ -172,7 +191,11 @@ export class AppComponent implements OnInit {
       this.sub.unsubscribe();
       this.classes = [];
       this.groups = [];
-      this.isSimulationStarted = false;
+      this.simulationDuration = 1;
+      this.nbClasses = 0;
+      this.nbGroups = 0;
+      // this.isSimulationStarted = false;
+      this.output();
     } else {
       console.clear();
       console.log('No simulation running.')
@@ -315,6 +338,7 @@ export class AppComponent implements OnInit {
       }
       // Update boolean isWeekend (fri.5PM to mon.9AM : 64h + 104h = 168h)
       if (t % 168 === 0 && t !== 0) {
+        this.outputWeek(this.weeknumber);
         this.weeknumber++;
         this.isWeekEnd = false;
         this.timeToWE = 104;
@@ -619,5 +643,100 @@ export class AppComponent implements OnInit {
     const id = _.padStart(this.idCpt, 8, '0');
     this.idCpt++;
     return id;
+  }
+
+  public outputWeek(n: number) {
+    if (n === 1) {
+      this.nbSperW[n - 1] = this.finishedSmallJobs.length;
+      this.nbMperW[n - 1] = this.finishedMediumJobs.length;
+      this.nbLperW[n - 1] = this.finishedLargeJobs.length;
+      this.nbHperW[n - 1] = this.finishedHugeJobs.length;
+    } else {
+      let val = this.finishedSmallJobs.length - _.sum(this.nbSperW);
+      this.nbSperW.push(val);
+      val = this.finishedMediumJobs.length - _.sum(this.nbMperW);
+      this.nbMperW.push(val);
+      val = this.finishedLargeJobs.length - _.sum(this.nbLperW);
+      this.nbLperW.push(val);
+      val = this.finishedHugeJobs.length - _.sum(this.nbHperW);
+      this.nbHperW.push(val);
+    }
+
+    this.textOutput += '\n ------- Week ' + n + ' ------- \n\n';
+
+    this.textOutput += 'Amount of small jobs performed : ' + this.nbSperW[n - 1] + '\n';
+    this.textOutput += 'Amount of medium jobs performed : ' + this.nbMperW[n - 1] + '\n';
+    this.textOutput += 'Amount of large jobs performed : ' + this.nbLperW[n - 1] + '\n';
+    this.textOutput += 'Amount of huge jobs performed : ' + this.nbHperW[n - 1] + '\n\n';
+  }
+
+  public output() {
+    let nbMachineHour = 0;
+    const mhs = _.map(this.finishedSmallJobs, (j: Job) => {
+      return j.cpu * j.runtime;
+    });
+    nbMachineHour += _.sum(mhs);
+    const mhm = _.map(this.finishedMediumJobs, (j: Job) => {
+      return j.cpu * j.runtime;
+    });
+    nbMachineHour += _.sum(mhm);
+    const mhl = _.map(this.finishedLargeJobs, (j: Job) => {
+      return j.cpu * j.runtime;
+    });
+    nbMachineHour += _.sum(mhl);
+    const mhh = _.map(this.finishedHugeJobs, (j: Job) => {
+      return j.cpu * j.runtime;
+    });
+    nbMachineHour += _.sum(mhh);
+
+    const averageWaitTimeS = this.calculateAvgWaitTime(this.finishedSmallJobs);
+    const averageWaitTimeM = this.calculateAvgWaitTime(this.finishedMediumJobs);
+    const averageWaitTimeL = this.calculateAvgWaitTime(this.finishedLargeJobs);
+    const averageWaitTimeH = this.calculateAvgWaitTime(this.finishedHugeJobs);
+
+    const averageTurnS = this.calculateAvgTurn(this.finishedSmallJobs);
+    const averageTurnM = this.calculateAvgTurn(this.finishedMediumJobs);
+    const averageTurnL = this.calculateAvgTurn(this.finishedLargeJobs);
+    const averageTurnH = this.calculateAvgTurn(this.finishedHugeJobs);
+
+    this.textOutput += 'Total machine-hour consumed : ' + nbMachineHour + ' \n';
+    this.textOutput += 'Total cost : TODO\n\n';
+    this.textOutput += '----- Average wait time -----\n\n';
+    this.textOutput += 'For a small job : ' + averageWaitTimeS + ' hrs\n'
+    this.textOutput += 'For a medium job : ' + averageWaitTimeM + ' hrs\n'
+    this.textOutput += 'For a large job : ' + averageWaitTimeL + ' hrs\n'
+    this.textOutput += 'For a huge job : ' + averageWaitTimeH + ' hrs\n\n'
+    this.textOutput += '----- Average turnaround time ratio -----\n\n';
+    this.textOutput += 'For a small job : ' + averageTurnS + '\n'
+    this.textOutput += 'For a medium job : ' + averageTurnM + '\n'
+    this.textOutput += 'For a large job : ' + averageTurnL + '\n'
+    this.textOutput += 'For a huge job : ' + averageTurnH + '\n\n'
+
+  }
+
+  public calculateAvgWaitTime(jobs: Job[]) {
+    if (jobs.length === 0) {
+      return 'ERR : could not be calculated';
+    } else {
+      let totalWaitTime = 0;
+      _.forEach(jobs, (j) => {
+        const waitTime = j.startDate - j.queueDate
+        totalWaitTime += waitTime;
+      });
+      return Math.floor(totalWaitTime / jobs.length);
+    }
+  }
+
+  public calculateAvgTurn(jobs: Job[]) {
+    if (jobs.length === 0) {
+      return 'ERR : could not be calculated';
+    } else {
+      let sum = 0;
+      _.forEach(jobs, (j) => {
+        const frac = (j.startDate - j.queueDate) / j.runtime;
+        sum += frac;
+      });
+      return Math.floor(sum / jobs.length);
+    }
   }
 }

@@ -1,6 +1,6 @@
 <div style="height: 100%">
   <h2>Simulation webapp</h2>
-  <div class="parameters">
+  <div class="parameters" *ngIf="!isSimulationStarted">
     <div>
       <h3>Please enter simulation parameters :</h3>
       <div>
@@ -36,7 +36,7 @@
             <input type="number" min="0" [(ngModel)]="group.nbResearchers" (input)="updateGroup(group)">
           </div>
           <div>
-            <label>Max ressources per class (core/hour) :</label>
+            <label>Max ressources per group (core/hour) :</label>
             <input type="number" min="0" [(ngModel)]="group.ressources">
           </div>
         </div>
@@ -69,11 +69,11 @@
     </div>
   </div>
   <div class="buttons">
-    <button type="submit" (click)="launchSimulation();">Start simulation</button>
-    <button type="submit" (click)="stopSimulation();">Stop simulation</button>
+    <button *ngIf="!isSimulationStarted" type="submit" (click)="launchSimulation();">Start simulation</button>
+    <button *ngIf="isSimulationStarted" type="submit" (click)="stopSimulation();">Stop simulation</button>
   </div>
 
-  <div>
+  <div *ngIf="isSimulationStarted">
     <h2>Simulation live data</h2>
     <label>Hours of simulation : </label>{{time}} ,
     <label *ngIf="!isWeekEnd" style="color:green">Week</label>
@@ -89,7 +89,7 @@
     <br/>
   </div>
 
-  <div class="output">
+  <div class="output" *ngIf="isSimulationStarted">
     <h2>Output</h2>
     <textarea [(ngModel)]="textOutput"></textarea>
   </div>
