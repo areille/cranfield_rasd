@@ -699,8 +699,8 @@ export class AppComponent implements OnInit {
     const averageTurnL = this.calculateAvgTurn(this.finishedLargeJobs);
     const averageTurnH = this.calculateAvgTurn(this.finishedHugeJobs);
 
-    this.textOutput += 'Total machine-hour consumed : ' + nbMachineHour + ' \n';
-    this.textOutput += 'Total cost : TODO\n\n';
+    this.textOutput += 'Total machine-hour consumed : ' + nbMachineHour + ' h \n';
+    this.textOutput += 'Total cost : ' + (nbMachineHour * 25) + ' $ \n\n';
     this.textOutput += '----- Average wait time -----\n\n';
     this.textOutput += 'For a small job : ' + averageWaitTimeS + ' hrs\n'
     this.textOutput += 'For a medium job : ' + averageWaitTimeM + ' hrs\n'
