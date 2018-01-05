@@ -292,8 +292,8 @@ export class AppComponent implements OnInit {
       // Prints out the current time
       // console.log('tick : ' + t + ' hour(s) passed.');
       // const testProb = (1 / this.simulationDuration * 168) * Math.exp(-t / (this.simulationDuration * 168)) * 100;
-      // const proba = Math.floor(Math.exp(-2 * t / (this.simulationDuration * 168)) * 50);
-      const proba = Math.floor(Math.exp(-2 * t / (168)) * 50);
+      const proba = Math.floor(Math.exp(-2 * t / (this.simulationDuration * 168)) * 50);
+      // const proba = Math.floor(Math.exp(-2 * t / (168)) * 50);
       // const testProb = Math.exp(-t / 168) * 100;
       // console.log('Testprob :' + proba);
       this.time = t;
