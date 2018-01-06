@@ -6,7 +6,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 To run the webapp you must have [Node](https://nodejs.org/en/) version 6.9.0 or above.
 Then you need to download [Angular CLI](https://github.com/angular/angular-cli).
-`npm install -g @angular/cli`
+>`npm install -g @angular/cli`
 
 ## Development server
 
