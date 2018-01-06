@@ -2,9 +2,11 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.1.1.
 
-## DEPENDENCIES
+## Dependencies
 
 To run the webapp you must have [Node](https://nodejs.org/en/) version 6.9.0 or above.
+Then you need to download [Angular CLI](https://github.com/angular/angular-cli).
+`npm install -g @angular/cli`
 
 ## Development server
 
