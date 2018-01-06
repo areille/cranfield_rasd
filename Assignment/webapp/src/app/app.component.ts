@@ -164,7 +164,7 @@ export class AppComponent implements OnInit {
       console.log('Monday, 9AM.');
       this.isSimulationStarted = true;
 
-      this.textOutput += 'Simulation duration : ' + this.simulationDuration + '\n\n';
+      this.textOutput += 'Simulation duration : ' + this.simulationDuration + ' week(s).\n\n';
       this.textOutput += 'Number of nodes : ' + this.nbNode + '\n';
       this.textOutput += 'Number of cores : ' + this.nbCorePerNode + '\n';
       this.textOutput += 'Total number of cores : ' + this.nbCoreTot + '\n\n';
