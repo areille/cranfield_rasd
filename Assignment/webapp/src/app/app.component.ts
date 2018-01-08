@@ -292,7 +292,7 @@ export class AppComponent implements OnInit {
       // Prints out the current time
       // console.log('tick : ' + t + ' hour(s) passed.');
       // const testProb = (1 / this.simulationDuration * 168) * Math.exp(-t / (this.simulationDuration * 168)) * 100;
-      const proba = Math.floor(Math.exp(-2 * t / (this.simulationDuration * 168)) * 50);
+      const proba = Math.floor(Math.exp(-2 * t / 168) * 50);
       // const proba = Math.floor(Math.exp(-2 * t / (168)) * 50);
       // const testProb = Math.exp(-t / 168) * 100;
       // console.log('Testprob :' + proba);
@@ -359,8 +359,13 @@ export class AppComponent implements OnInit {
     // Mostly for display
     this.nbCoreTot = this.nbCorePerNode * this.nbNode;
     this.nbCoreS = Math.floor(this.nbCoreTot * 0.1);
+    this.availableCoreS = this.nbCoreS;
     this.nbCoreM = Math.floor(this.nbCoreTot * 0.3);
+    this.availableCoreM = this.nbCoreM;
     this.nbCoreL = Math.floor(this.nbCoreTot * 0.5);
+    this.availableCoreL = this.nbCoreL;
+    this.nbCoreH = this.nbCoreTot;
+    this.availableCoreH = this.nbCoreH;
   }
 
   /**
